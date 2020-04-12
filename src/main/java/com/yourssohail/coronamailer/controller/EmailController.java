@@ -28,17 +28,27 @@ public class EmailController {
     @GetMapping()
     public String showForm(Model model){
 
-        List<String> countryList = service.getCountryList();
         EmailModel email = new EmailModel();
-        model.addAttribute("countryList",countryList);
+
+        model.addAttribute("countryList",service.getCountryList());
         model.addAttribute("emailobj",email);
         return "form";
     }
 
     @PostMapping("/subscribe")
-    public String emailRegistration(@ModelAttribute("emailobj") EmailModel email){
+    public String emailRegistration(@ModelAttribute("emailobj") EmailModel email,Model model){
         System.out.println(email);
-        repository.save(email);
-        return "success";
+        if(repository.existsByEmail(email.getEmail())){
+            System.err.println("Email already exists");
+            model.addAttribute("emailExists",true);
+            model.addAttribute("countryList",service.getCountryList());
+            model.addAttribute("errorMsg","Email already exists");
+            return "form";
+        }else{
+            System.out.println("Saving email");
+            repository.save(email);
+            return "success";
+        }
+
     }
 }

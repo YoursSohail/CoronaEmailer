@@ -14,28 +14,23 @@
             text-align: center;
             min-height: 100vh;
         }
+
     </style>
 </head>
 <body>
-<div class="container" align="center" id="container-center">
-    <h1 class="title">Subscribe to stay updated</h1>
+<div class="container green-curved-border" align="center" id="container-center">
+    <h1 class="title is-1" style="font-family: 'JetBrains Mono'">Corona Emailer</h1>
+    <h2 class="title is-4">Subscribe to stay updated</h2>
     <form action="#" th:action="@{/subscribe}" method="post" th:object="${emailobj}">
         <div class="field">
             <div class="control has-icons-left has-icons-right">
-                <input class="input" type="email" placeholder="Enter email" th:field="*{email}">
+                <input class="input" type="email" placeholder="Enter email" th:field="*{email}" required>
                 <span class="icon is-small is-left">
                     <i class="fas fa-envelope"></i>
                 </span>
-
-               <!-- <div class="select is-rounded">
-                    <select th:field="*{country}">
-                        <option th:each="c : ${countryList}" th:value="${c}" th:text="${c}"/>
-                    </select>
-                </div>-->
-
                 <div class="control" style="padding-top: 2px;">
                     <div class="select">
-                        <select th:field="*{country}">
+                        <select th:field="*{country}" required>
                             <option th:each="c : ${countryList}"
                                     th:value="${c}" th:text="${c}">Select Countries</option>
                         </select>
@@ -43,7 +38,13 @@
                 </div>
             </div>
         </div>
-        <div class="field">
+
+        <span th:if="${emailExists}" class="tag is-danger is-light is-medium">
+                Email already exists
+        </span>
+
+
+        <div class="field" style="padding-top: 4px;">
             <button type="submit" class="button is-success is-rounded">Subscribe</button>
         </div>
     </form>

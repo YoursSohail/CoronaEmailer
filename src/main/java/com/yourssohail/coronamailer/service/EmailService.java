@@ -36,7 +36,7 @@ public class EmailService {
         this.contentBuilder = contentBuilder;
     }
 
-    @Scheduled(cron = "0 11 18 * * ?")
+    @Scheduled(cron = "0 0 9 * * ?")
     public void testingScheduler(){
         scrapForCovidStats();
     }
