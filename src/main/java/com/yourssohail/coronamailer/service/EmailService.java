@@ -17,7 +17,9 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 @Service
@@ -34,7 +36,7 @@ public class EmailService {
         this.contentBuilder = contentBuilder;
     }
 
-    @Scheduled(cron = "0 41 16 * * ?")
+    @Scheduled(cron = "0 10 18 * * ?")
     public void testingScheduler(){
         scrapForCovidStats();
     }
@@ -43,54 +45,60 @@ public class EmailService {
         WebClient webClient = new WebClient();
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(true);
-        String url = "https://www.google.com/search?sa=X&sxsrf=ALeKk01KTM8iFFllA-uXvU4GjGrlcWQdbw:1586533651619&q=COVID-19&biw=1366&bih=673";
-        try {
-            HtmlPage page = webClient.getPage(url);
-            Document doc = Jsoup.parse(page.asXml());
-            Elements main = doc.getElementsByClass("qyEGdc");
 
-            //Worldwide
-            Element worldwide = main.get(2);
-            Elements worldStats = worldwide.getElementsByClass("yeRnY sz9i9");
-            String worldConfirmed = worldStats.get(0).ownText();
-            String worldRecovered = worldStats.get(1).ownText();
-            String worldDeaths = worldStats.get(2).ownText();
+        List<EmailModel> emails = repository.findAll();
 
-            System.out.println("WorldConfirmed - "+worldConfirmed);
-            System.out.println("WorldRecovered - "+worldRecovered);
-            System.out.println("WorldDeaths - "+worldDeaths);
+        for(EmailModel to : emails) {
+            System.out.println("Sending email to: "+to.getEmail());
+
+            String url = "https://www.google.com/search?q=corona+cases+"+to.getCountry().toLowerCase();
+            try {
+                HtmlPage page = webClient.getPage(url);
+                Document doc = Jsoup.parse(page.asXml());
+                Elements main = doc.getElementsByClass("qyEGdc");
+
+                System.out.println(">>> Main "+main);
 
 
-            //India
-            Element india = main.get(1);
-            Elements count = india.getElementsByClass("yeRnY sz9i9");
-            String confirmed = count.get(0).ownText();
-            String recovered = count.get(1).ownText();
-            String deaths = count.get(2).ownText();
-            System.out.println("Total Confirmed India - "+confirmed);
-            System.out.println("Total Recovered India - "+recovered);
-            System.out.println("Total Deaths India - "+deaths);
+                //Worldwide
+                Element worldwide = main.get(1);
+                Elements worldStats = worldwide.getElementsByClass("yeRnY sz9i9");
+                String worldConfirmed = worldStats.get(0).ownText();
+                String worldRecovered = worldStats.get(1).ownText();
+                String worldDeaths = worldStats.get(2).ownText();
+
+                System.out.println("WorldConfirmed - " + worldConfirmed);
+                System.out.println("WorldRecovered - " + worldRecovered);
+                System.out.println("WorldDeaths - " + worldDeaths);
 
 
-            sendEmail(confirmed,recovered,deaths,
-                    worldConfirmed,worldRecovered,worldDeaths);
+                //India
+                Element india = main.get(0);
+                Elements count = india.getElementsByClass("yeRnY sz9i9");
+                String confirmed = count.get(0).ownText();
+                String recovered = count.get(1).ownText();
+                String deaths = count.get(2).ownText();
+                System.out.println("Total Confirmed India - " + confirmed);
+                System.out.println("Total Recovered India - " + recovered);
+                System.out.println("Total Deaths India - " + deaths);
 
 
+                sendEmail(to.getEmail(),to.getCountry(),confirmed, recovered, deaths,
+                        worldConfirmed, worldRecovered, worldDeaths);
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void sendEmail(String confirmed, String recovered, String deaths, String worldConfirmed, String worldRecovered, String worldDeaths){
+    public void sendEmail(String to,String country,String confirmed, String recovered, String deaths, String worldConfirmed, String worldRecovered, String worldDeaths){
         final String from = mailCofig.getEmailFrom();
 
-        List<EmailModel> emails = repository.findAll();
-        System.out.println("All emails: "+emails);
-        for(EmailModel to : emails) {
 
-            System.out.println("Sending email to: "+to.getEmail());
+
+            System.out.println("Sending email to: "+to);
 
             String host = "smtp.gmail.com";
 
@@ -113,19 +121,12 @@ public class EmailService {
             try {
                 Message msg = new MimeMessage(session);
                 msg.setFrom(new InternetAddress(from));
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to.getEmail()));
-                msg.setSubject("Testing Covid Emailer");
+                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+                msg.setSubject("Corona Emailer : Daily Stats");
                 System.out.println("Sending....");
 
 
-                /*String content = "<p>Total Confirmed India - " + confirmed + "</p>" +
-                        "<p>Total Recovered India - " + recovered + "</p>" + "<p>Total Deaths India - " +
-                        deaths + "</p>"+"<hr>"+
-                        "<p>Total Confirmed Worldwide - " + worldConfirmed + "</p>" +
-                        "<p>Total Recovered Worldwide - " + worldRecovered + "</p>" +
-                        "<p>Total Deaths Worldwide - "+ worldDeaths;*/
-
-                String content = contentBuilder.build(confirmed,recovered,deaths,
+                String content = contentBuilder.build(country,confirmed,recovered,deaths,
                         worldConfirmed,worldRecovered,worldDeaths);
 
 
@@ -141,7 +142,16 @@ public class EmailService {
                 e.printStackTrace();
             }
 
+    }
+
+    public List<String> getCountryList(){
+        String[] countryCode = Locale.getISOCountries();
+        List<String> countryList = new ArrayList<>();
+        for(String c : countryCode){
+            Locale obj = new Locale("",c);
+            countryList.add(obj.getDisplayCountry());
         }
+        return countryList;
     }
 
 

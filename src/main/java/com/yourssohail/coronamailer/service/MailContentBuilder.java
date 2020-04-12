@@ -15,10 +15,11 @@ public class MailContentBuilder {
         this.templateEngine = templateEngine;
     }
 
-    public String build(String countryConfirmed,String countryRecovered,String countryDeaths,
+    public String build(String countryName,String countryConfirmed,String countryRecovered,String countryDeaths,
                         String worldwideConfirmed,String worldwideRecovered,String worldwideDeaths){
 
         Context context = new Context();
+        context.setVariable("countryName",countryName);
         context.setVariable("countryConfirmed",countryConfirmed);
         context.setVariable("countryRecovered",countryRecovered);
         context.setVariable("countryDeaths",countryDeaths);

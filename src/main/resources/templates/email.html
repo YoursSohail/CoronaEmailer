@@ -7,24 +7,18 @@
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 </head>
 <body>
-<h2 class="title">Corona Emailer</h2>
+<h2 class="title">Updated Corona Stats</h2>
 <div class="container">
 
-    <h3 class="subTitle">India</h3>
-    <p>Total Confirmed</p>
-    <span th:text="${countryConfirmed}"/>
-    <p>Total Recovered</p>
-    <span th:text="${countryRecovered}"/>
-    <p>Total Deaths</p>
-    <span th:text="${countryDeaths}"/>
+    <h3 class="subTitle"><u th:text="${countryName}"></u></h3>
+    <p>Total Confirmed - <span th:text="${countryConfirmed}"/></p>
+    <p>Total Recovered - <span th:text="${countryRecovered}"/></p>
+    <p>Total Deaths - <span th:text="${countryDeaths}"/></p>
 
-    <h3 class="subTitle">Worldwide</h3>
-    <p>Total Confirmed</p>
-    <span th:text="${worldwideConfirmed}"/>
-    <p>Total Recovered</p>
-    <span th:text="${worldwideDeaths}"/>
-    <p>Total Deaths</p>
-    <span th:text="${worldwideDeaths}"/>
+    <h3 class="subTitle"><u>Worldwide</u></h3>
+    <p>Total Confirmed - <span th:text="${worldwideConfirmed}"/></p>
+    <p>Total Recovered - <span th:text="${worldwideDeaths}"/></p>
+    <p>Total Deaths - <span th:text="${worldwideDeaths}"/></p>
 </div>
 </body>
 </html>

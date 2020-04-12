@@ -15,6 +15,8 @@ public class EmailModel {
    @Email
    private String email;
 
+   private String country;
+
     public EmailModel() {
     }
 
@@ -34,11 +36,20 @@ public class EmailModel {
         this.id = id;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
     @Override
     public String toString() {
         return "EmailModel{" +
                 "id=" + id +
                 ", email='" + email + '\'' +
+                ", country='" + country + '\'' +
                 '}';
     }
 }
