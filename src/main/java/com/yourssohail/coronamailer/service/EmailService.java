@@ -32,7 +32,7 @@ public class EmailService {
         this.mailCofig = mailCofig;
     }
 
-    @Scheduled(cron = "0 40 15 * * ?")
+    @Scheduled(cron = "0 13 16 * * ?")
     public void testingScheduler(){
         scrapForCovidStats();
     }
@@ -46,16 +46,32 @@ public class EmailService {
             HtmlPage page = webClient.getPage(url);
             Document doc = Jsoup.parse(page.asXml());
             Elements main = doc.getElementsByClass("qyEGdc");
-            Element element = main.get(1);
-            Elements count = element.getElementsByClass("yeRnY sz9i9");
+
+            //Worldwide
+            Element worldwide = main.get(2);
+            Elements worldStats = worldwide.getElementsByClass("yeRnY sz9i9");
+            String worldConfirmed = worldStats.get(0).ownText();
+            String worldRecovered = worldStats.get(1).ownText();
+            String worldDeaths = worldStats.get(2).ownText();
+
+            System.out.println("WorldConfirmed - "+worldConfirmed);
+            System.out.println("WorldRecovered - "+worldRecovered);
+            System.out.println("WorldDeaths - "+worldDeaths);
+
+
+            //India
+            Element india = main.get(1);
+            Elements count = india.getElementsByClass("yeRnY sz9i9");
             String confirmed = count.get(0).ownText();
             String recovered = count.get(1).ownText();
             String deaths = count.get(2).ownText();
-            System.out.println("Total Confirmed - "+confirmed);
-            System.out.println("Total Recovered - "+recovered);
-            System.out.println("Total Deaths - "+deaths);
+            System.out.println("Total Confirmed India - "+confirmed);
+            System.out.println("Total Recovered India - "+recovered);
+            System.out.println("Total Deaths India - "+deaths);
 
-            sendEmail(confirmed,recovered,deaths);
+
+            sendEmail(confirmed,recovered,deaths,
+                    worldConfirmed,worldRecovered,worldDeaths);
 
 
 
@@ -65,7 +81,7 @@ public class EmailService {
         }
     }
 
-    public void sendEmail(String confirmed,String recovered,String deaths){
+    public void sendEmail(String confirmed, String recovered, String deaths, String worldConfirmed, String worldRecovered, String worldDeaths){
         final String from = mailCofig.getEmailFrom();
 
         List<EmailModel> emails = repository.findAll();
@@ -100,8 +116,12 @@ public class EmailService {
                 System.out.println("Sending....");
 
 
-                String content = "<p>Total Confirmed - " + confirmed + "</p>" +
-                        "<p>Total Recovered - " + recovered + "</p>" + "<p>Total Deaths - " + deaths + "</p>";
+                String content = "<p>Total Confirmed India - " + confirmed + "</p>" +
+                        "<p>Total Recovered India - " + recovered + "</p>" + "<p>Total Deaths India - " +
+                        deaths + "</p>"+"<hr>"+
+                        "<p>Total Confirmed Worldwide - " + worldConfirmed + "</p>" +
+                        "<p>Total Recovered Worldwide - " + worldRecovered + "</p>" +
+                        "<p>Total Deaths Worldwide - "+ worldDeaths;
                 msg.setContent(
                         content,
                         "text/html; charset=UTF-8"
