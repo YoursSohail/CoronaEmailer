@@ -36,20 +36,19 @@ public class EmailService {
         this.contentBuilder = contentBuilder;
     }
 
-    @Scheduled(cron = "0 10 18 * * ?")
+    @Scheduled(cron = "0 11 18 * * ?")
     public void testingScheduler(){
         scrapForCovidStats();
     }
 
     public void scrapForCovidStats(){
-        WebClient webClient = new WebClient();
-        webClient.getOptions().setCssEnabled(false);
-        webClient.getOptions().setJavaScriptEnabled(true);
-
         List<EmailModel> emails = repository.findAll();
 
         for(EmailModel to : emails) {
             System.out.println("Sending email to: "+to.getEmail());
+            WebClient webClient = new WebClient();
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
 
             String url = "https://www.google.com/search?q=corona+cases+"+to.getCountry().toLowerCase();
             try {
