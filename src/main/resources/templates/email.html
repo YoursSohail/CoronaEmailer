@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Corona Emailer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+</head>
+<body>
+<h2 class="title">Corona Emailer</h2>
+<div class="container">
+
+    <h3 class="subTitle">India</h3>
+    <p>Total Confirmed</p>
+    <span th:text="${countryConfirmed}"/>
+    <p>Total Recovered</p>
+    <span th:text="${countryRecovered}"/>
+    <p>Total Deaths</p>
+    <span th:text="${countryDeaths}"/>
+
+    <h3 class="subTitle">Worldwide</h3>
+    <p>Total Confirmed</p>
+    <span th:text="${worldwideConfirmed}"/>
+    <p>Total Recovered</p>
+    <span th:text="${worldwideDeaths}"/>
+    <p>Total Deaths</p>
+    <span th:text="${worldwideDeaths}"/>
+</div>
+</body>
+</html>

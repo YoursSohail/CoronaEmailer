@@ -25,14 +25,16 @@ public class EmailService {
 
     private EmailRepository repository;
     private MailCofig mailCofig;
+    private MailContentBuilder contentBuilder;
 
     @Autowired
-    public EmailService(EmailRepository repository, MailCofig mailCofig) {
+    public EmailService(EmailRepository repository, MailCofig mailCofig, MailContentBuilder contentBuilder) {
         this.repository = repository;
         this.mailCofig = mailCofig;
+        this.contentBuilder = contentBuilder;
     }
 
-    @Scheduled(cron = "0 13 16 * * ?")
+    @Scheduled(cron = "0 41 16 * * ?")
     public void testingScheduler(){
         scrapForCovidStats();
     }
@@ -116,12 +118,18 @@ public class EmailService {
                 System.out.println("Sending....");
 
 
-                String content = "<p>Total Confirmed India - " + confirmed + "</p>" +
+                /*String content = "<p>Total Confirmed India - " + confirmed + "</p>" +
                         "<p>Total Recovered India - " + recovered + "</p>" + "<p>Total Deaths India - " +
                         deaths + "</p>"+"<hr>"+
                         "<p>Total Confirmed Worldwide - " + worldConfirmed + "</p>" +
                         "<p>Total Recovered Worldwide - " + worldRecovered + "</p>" +
-                        "<p>Total Deaths Worldwide - "+ worldDeaths;
+                        "<p>Total Deaths Worldwide - "+ worldDeaths;*/
+
+                String content = contentBuilder.build(confirmed,recovered,deaths,
+                        worldConfirmed,worldRecovered,worldDeaths);
+
+
+
                 msg.setContent(
                         content,
                         "text/html; charset=UTF-8"
