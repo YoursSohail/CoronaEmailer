@@ -32,5 +32,8 @@ com.yourssohail.emailFrom=EMAILID
 com.yourssohail.password=PASSWORD
 ```    
 * #### Build & Run
+```
+localhost:8080
+```
 
   
